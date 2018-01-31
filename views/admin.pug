@@ -1,0 +1,26 @@
+extends layout
+include mixins
+block content
+
+    if rows.length === 0
+      p Engar færslur
+    else
+      table.table
+        tr.table__row
+          th Id
+          th Dagsetning
+          th Nafn
+          th Kennitala
+          th Netfang
+          th Fjöldi
+        each row in rows
+          tr
+            td= row.id
+            td= row.datetime
+            td= row.name
+            td= row.ssn
+            td= row.email
+            td= row.amount
+
+      p: a(href='/admin/download') Sækja
+

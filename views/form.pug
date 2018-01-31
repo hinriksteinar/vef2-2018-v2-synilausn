@@ -1,0 +1,16 @@
+extends layout
+include mixins
+block content
+
+  if errors && errors.length > 0
+    ul.validation
+      each error in errors
+        li.validation__item: label(for=error.param)= error.msg
+
+  form.form(method="post", action="/")
+    +input('Nafn', 'name', data.name, isInvalid('name', errors))
+    +input('Netfang', 'email', data.email, isInvalid('email', errors))
+    +input('Kennitala', 'ssn', data.ssn, isInvalid('ssn', errors))
+    +input('Fjöldi', 'amount', data.amount, isInvalid('amount', errors))(type='number')
+
+    button.form__button Senda
