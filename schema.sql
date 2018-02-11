@@ -5,4 +5,4 @@ CREATE TABLE orders (
   email character varying(255) NOT NULL,
   amount integer NOT NULL,
   ssn character varying(16)
-)
+);

@@ -1,6 +1,7 @@
+require('dotenv').config();
+
 const path = require('path');
 const express = require('express');
-const cookieParser = require('cookie-parser');
 const session = require('express-session');
 
 const form = require('./form');
@@ -12,15 +13,19 @@ const passport = require('passport');
 const { Strategy } = require('passport-local');
 const users = require('./users');
 
-const sessionSecret = '3498hgpihr,mnvxf';
+const sessionSecret = process.env.SESSION_SECRET || 'fj489jfadkljv';
 
-app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(session({
   secret: sessionSecret,
   resave: false,
   saveUninitialized: false,
 }));
+
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'pug');
+
+app.use(express.static(path.join(__dirname, 'public')));
 
 function strat(username, password, done) {
   users
@@ -64,6 +69,7 @@ app.use((req, res, next) => {
   next();
 });
 
+// hjálparfall fyrir view
 app.locals.isInvalid = (param, errors) => {
   if (!errors) {
     return false;
@@ -78,7 +84,9 @@ app.get('/login', (req, res) => {
 
 app.post(
   '/login',
-  passport.authenticate('local', { failureRedirect: '/login' }),
+  passport.authenticate('local', {
+    failureRedirect: '/login',
+  }),
   (req, res) => {
     res.redirect('/admin');
   },
@@ -88,11 +96,6 @@ app.get('/logout', (req, res) => {
   req.logout();
   res.redirect('/');
 });
-
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'pug');
-
-app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', form);
 app.use('/admin', admin);
@@ -109,9 +112,11 @@ function errorHandler(err, req, res, next) { // eslint-disable-line
 app.use(notFoundHandler);
 app.use(errorHandler);
 
-const hostname = '127.0.0.1';
-const port = 3000;
+const {
+  PORT: port = 3000,
+  HOST: host = '127.0.0.1',
+} = process.env;
 
-app.listen(port, hostname, () => {
-  console.info(`Server running at http://${hostname}:${port}/`);
+app.listen(port, () => {
+  console.info(`Server running at http://${host}:${port}/`);
 });

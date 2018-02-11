@@ -1,2 +1,5 @@
 node_modules/
 synilausn/
+
+# .env ætti aldrei að geyma í source control þar sem þar eru oft leyndarmál
+.env

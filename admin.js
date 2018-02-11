@@ -1,63 +1,24 @@
 const express = require('express');
-const { Client } = require('pg');
 
-const connectionString = 'postgres://:@localhost/v2';
+const { ensureLoggedIn, catchErrors } = require('./utils');
+const { fetchData } = require('./db');
 
 const router = express.Router();
 
-function ensureLoggedIn(req, res, next) {
-  if (req.isAuthenticated()) {
-    return next();
-  }
+async function data(req, res) {
+  const rows = await fetchData();
 
-  return res.redirect('/login');
+  return res.render('admin', { rows, showLogin: false, title: 'Stjórnsíða' });
 }
 
-function catchErrors(fn) {
-  return (req, res, next) => fn(req, res, next).catch(next);
-}
+async function download(req, res) {
+  const rows = await fetchData();
 
-async function data(req, res, next) {
-  const client = new Client({
-    connectionString,
-  });
-  await client.connect();
+  const header = 'date;name;email;amount;ssn';
+  const body = rows.map(row => `${row.datetime};${row.name};${row.email};${row.amount};${row.ssn}`).join('\n');
 
-  try {
-    const result = await client.query('SELECT * FROM orders');
-
-    const { rows } = result;
-    return res.render('admin', { rows, showLogin: false });
-  } catch (err) {
-    console.error('Error selecting', err);
-    return next(err);
-  } finally {
-    await client.end();
-  }
-}
-
-async function download(req, res, next) {
-  const client = new Client({
-    connectionString,
-  });
-  await client.connect();
-
-  try {
-    const result = await client.query('SELECT * FROM orders');
-
-    const { rows } = result;
-    const header = 'date;name;email;amount;ssn';
-    const body = rows.map(row => `${row.datetime};${row.name};${row.email};${row.amount};${row.ssn}`).join('\n');
-
-    res.type('text/csv');
-    res.send([header, body].join('\n'));
-    return res.end();
-  } catch (err) {
-    console.error('Error selecting', err);
-    return next(err);
-  } finally {
-    await client.end();
-  }
+  res.type('text/csv');
+  res.send([header, body].join('\n'));
 }
 
 router.get('/', ensureLoggedIn, catchErrors(data));
