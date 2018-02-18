@@ -32,7 +32,7 @@ function strat(username, password, done) {
     .findByUsername(username)
     .then((user) => {
       if (!user) {
-        return done(null, false);
+        return false;
       }
 
       return users.comparePasswords(password, user);
@@ -79,12 +79,19 @@ app.locals.isInvalid = (param, errors) => {
 };
 
 app.get('/login', (req, res) => {
-  res.render('login', { showLogin: false, title: 'Innskráning' });
+  let message = '';
+
+  if (req.session.messages && req.session.messages.length > 0) {
+    message = req.session.messages.join(', ');
+  }
+
+  res.render('login', { showLogin: false, message, title: 'Innskráning' });
 });
 
 app.post(
   '/login',
   passport.authenticate('local', {
+    failureMessage: 'Vitlaust notendanafn eða lykilorð',
     failureRedirect: '/login',
   }),
   (req, res) => {
