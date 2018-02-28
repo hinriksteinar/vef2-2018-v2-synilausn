@@ -3,6 +3,7 @@ const express = require('express');
 const { check, validationResult } = require('express-validator/check');
 const { sanitize } = require('express-validator/filter');
 
+const { catchErrors } = require('./utils');
 const { saveToDb } = require('./db');
 
 const router = express.Router();
@@ -71,7 +72,7 @@ function thanks(req, res) {
 }
 
 router.get('/', form);
-router.post('/', formValidation, formPost);
+router.post('/', formValidation, catchErrors(formPost));
 router.get('/thanks', thanks);
 
 module.exports = router;
