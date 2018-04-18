@@ -2,6 +2,8 @@
 
 [Sjá verkefnalýsingu fyrir verkefni 2](https://github.com/Vefforritun/vef2-2018-v2).
 
+[Yfirferð á sýnilausn](https://www.youtube.com/watch?v=5U9rr4KAYm4)
+
 Til að keyra þarf að byrja á að útbúa gagnagrunn fyrir verkefni og setja tengistreng fyrir hann í `.env` undir `DATABASE_URL`. Hægt er að afrita `.env_example` sem grunn.
 
 Eftir að búið er að útbúa grunn þarf að búa til töflu, hægt er að gera það með `node createdb.js`, síðan er hægt að keyra upp vefþjón á porti 3000 með:
